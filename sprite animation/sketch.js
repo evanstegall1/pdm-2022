@@ -248,6 +248,7 @@ class Character4 {
   
   stop() {
     this.move = 0;
+    image(this.spriteSheet, 0, 0, 32, 32 , 416 , 0, 2 * a, 2 * a);
   }
 }
 

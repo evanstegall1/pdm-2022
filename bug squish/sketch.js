@@ -136,15 +136,15 @@ class Insect {
   
   stop() {
     this.move = 0;
-    if (gameState == 'playing') {
-      score++;
-      draw();
-    }
   }
 
   grab() {
     if (mouseX > this.x - a && mouseX < this.x + a && 
       mouseY > this.y - a && mouseY < this.y + a) {
+        if (this.move != 0) {
+          score++;
+          draw();
+        }
         this.stop();
         this.grabbed = true;
     }

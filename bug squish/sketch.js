@@ -1,19 +1,27 @@
 let spriteSheet;
 let insect = [];
-let count = 10;
+let count = 80;
 let a = 20;
 let speed = 1;
+let startTime;
+let gameState = 'wait';
+let score = 0;
 
 function preload() {
   spriteSheet = loadImage("insect.png");
+  checkerboard = loadImage("checkerboard.jpg");
 }
 
 function setup() {
   createCanvas(600, 600);
   imageMode(CENTER);
   for (i = 0; i < count; i++) {
-  insect[i] = new Insect(spriteSheet, random(a, 600 - (2 * a)), random(50, 600 - (2 * a)), speed, random ([-1, 1]));
+  insect[i] = new Insect(spriteSheet, random(a, 600 - a), random(60, 600 - a), speed, random ([-1, 1]));
   }
+}
+
+function timer() {
+  return int((millis() - startTime) / 1000);
 }
 
 function mousePressed() {
@@ -23,9 +31,57 @@ function mousePressed() {
 }
 
 function draw() {
-  background(100, 255, 120);
-  for (i = 0; i < count; i++) {
-    insect[i].draw();
+  image(checkerboard, 300, 300, 600, 600, 0, 0, 500, 600);
+
+  textStyle(BOLDITALIC);
+  if (gameState == 'wait') {
+    fill('yellow');
+    rect(216, 280, 168, 30);
+    fill('black');
+    textSize(15);
+    textAlign(CENTER);
+    text('Press any key to start', 300, 300);
+    if (keyIsPressed) {
+      startTime = millis();
+      gameState = 'playing';
+    }
+  } else if (gameState == 'playing') {
+    for (i = 0; i < count; i++) {
+      insect[i].draw();
+    }
+    fill('yellow');
+    rect(0, 0, 125, 40);
+    fill('black');
+    fill('yellow');
+    rect(465, 0, 135, 40);
+    fill('black');
+    textSize(30);
+    text("Score: " + score, 530, 30);
+
+    let time = timer();
+    let totalTime = 30;
+    text("Time: " + (totalTime - time), 60, 30);
+    if (time >= totalTime) {
+      gameState = 'end';
+    }
+
+  } else if (gameState == 'end') {
+    fill('yellow');
+    rect(198, 220, 200, 100);
+    fill('black');
+    textSize(34);
+    text("Game Over", 300, 255);
+    line(216, 265, 380, 265);
+    textSize(22);
+    text("Final Score: " + score, 300, 290);
+    textSize(15);
+    text("(Press any key to restart)", 300, 310);
+    if (keyIsPressed) {
+      startTime = millis();
+      gameState = 'playing';
+      score = 0;
+      setup();
+    }
   }
 }
 
@@ -40,6 +96,7 @@ class Insect {
     this.speed = speed;
     this.move = move;
     this.facing = move;
+    this.score = score;
   }
 
   draw() {
@@ -56,6 +113,7 @@ class Insect {
 
     if (frameCount % 6 == 0) {
       this.sx = (this.sx + 1) % 7;
+      this.speed = this.speed + (1 / 160);
     }
 
     this.x += this.speed * this.move;
@@ -78,6 +136,10 @@ class Insect {
   
   stop() {
     this.move = 0;
+    if (gameState == 'playing') {
+      score++;
+      draw();
+    }
   }
 
   grab() {
@@ -88,4 +150,8 @@ class Insect {
     }
   }
 }
+
+
+
+
 
